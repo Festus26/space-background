@@ -1,40 +1,15 @@
-// Optimized Standalone Space Animation with Battery Saving Features
+// Standalone Space Animation - No dependencies required
+// This animation will work independently without needing any other files
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Get the canvas element
     const canvas = document.getElementById('space-canvas');
     if (!canvas) {
         console.error('Canvas element not found!');
         return;
     }
     
-    const ctx = canvas.getContext('2d', { 
-        alpha: false,  // Optimization: No transparency needed
-        desynchronized: true  // Better performance
-    });
-    
-    // Performance settings
-    const performanceMode = {
-        highPerformance: true,  // Set to false for battery saving
-        targetFPS: 60,
-        batteryFPS: 30,  // Lower FPS when on battery
-        reducedMotion: false
-    };
-    
-    // Detect battery status
-    let onBattery = false;
-    if ('getBattery' in navigator) {
-        navigator.getBattery().then(battery => {
-            onBattery = !battery.charging;
-            battery.addEventListener('chargingchange', () => {
-                onBattery = !battery.charging;
-                console.log(`Battery mode: ${onBattery ? 'On Battery' : 'Plugged In'}`);
-            });
-        });
-    }
-    
-    // Check for reduced motion preference
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-    performanceMode.reducedMotion = prefersReducedMotion.matches;
+    const ctx = canvas.getContext('2d');
     
     // Star properties
     const stars = [];
@@ -48,21 +23,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add meteors
     const meteors = [];
     
-    // Performance tracking
-    let lastFrameTime = performance.now();
-    let frameCount = 0;
-    let fps = 60;
-    
-    // Visibility API for pausing when tab is hidden
-    let isVisible = true;
-    document.addEventListener('visibilitychange', () => {
-        isVisible = !document.hidden;
-        if (isVisible) {
-            lastFrameTime = performance.now();
-            animate();
-        }
-    });
-    
     // Set canvas size to full window
     function resizeCanvas() {
         const oldWidth = canvas.width;
@@ -71,32 +31,28 @@ document.addEventListener('DOMContentLoaded', function() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
         
-        // Only regenerate if canvas actually changed size
+        // Only regenerate if canvas actually changed size (not initial load)
         if (oldWidth !== 0 && oldHeight !== 0) {
             generateNebulae();
             generateStars();
         }
     }
     
+    // Call resize on load and when window is resized
     resizeCanvas();
-    
-    // Debounce resize for better performance
-    let resizeTimeout;
-    window.addEventListener('resize', () => {
-        clearTimeout(resizeTimeout);
-        resizeTimeout = setTimeout(resizeCanvas, 150);
-    });
+    window.addEventListener('resize', resizeCanvas);
     
     // Generate stars with colored stars
     function generateStars() {
         stars.length = 0;
+        // Color options for stars
         const starColors = [
-            'rgba(255, 255, 255, 1)',
-            'rgba(173, 216, 230, 1)',
-            'rgba(255, 244, 229, 1)',
-            'rgba(255, 210, 161, 1)',
-            'rgba(224, 122, 95, 0.8)',
-            'rgba(129, 236, 236, 0.8)'
+            'rgba(255, 255, 255, 1)', // White
+            'rgba(173, 216, 230, 1)', // Light blue
+            'rgba(255, 244, 229, 1)', // Cream
+            'rgba(255, 210, 161, 1)', // Light orange
+            'rgba(224, 122, 95, 0.8)', // Reddish
+            'rgba(129, 236, 236, 0.8)' // Cyan
         ];
         
         for (let i = 0; i < numStars; i++) {
@@ -119,11 +75,11 @@ document.addEventListener('DOMContentLoaded', function() {
     function generateNebulae() {
         nebulae.length = 0;
         const colors = [
-            ['rgba(63, 81, 181, 0.07)', 'rgba(63, 81, 181, 0.03)'],
-            ['rgba(156, 39, 176, 0.07)', 'rgba(156, 39, 176, 0.03)'],
-            ['rgba(233, 30, 99, 0.07)', 'rgba(233, 30, 99, 0.03)'],
-            ['rgba(76, 175, 80, 0.06)', 'rgba(76, 175, 80, 0.02)'],
-            ['rgba(255, 152, 0, 0.06)', 'rgba(255, 152, 0, 0.02)']
+            ['rgba(63, 81, 181, 0.07)', 'rgba(63, 81, 181, 0.03)'],  // Blue
+            ['rgba(156, 39, 176, 0.07)', 'rgba(156, 39, 176, 0.03)'], // Purple
+            ['rgba(233, 30, 99, 0.07)', 'rgba(233, 30, 99, 0.03)'],   // Pink
+            ['rgba(76, 175, 80, 0.06)', 'rgba(76, 175, 80, 0.02)'],   // Green
+            ['rgba(255, 152, 0, 0.06)', 'rgba(255, 152, 0, 0.02)']    // Orange
         ];
         
         for (let i = 0; i < numNebulae; i++) {
@@ -162,10 +118,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Random chance to create a meteor (reduced frequency on battery)
+    // Random chance to create a meteor
     function maybeCreateMeteor() {
-        const chance = onBattery ? 0.002 : 0.005;
-        if (Math.random() < chance) {
+        if (Math.random() < 0.005) {
             createMeteor();
         }
     }
@@ -199,46 +154,39 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Random chance to create a shooting star (reduced frequency on battery)
+    // Random chance to create a shooting star
     function maybeCreateShootingStar() {
-        const chance = onBattery ? 0.005 : 0.01;
-        if (Math.random() < chance) {
+        if (Math.random() < 0.01) {
             createShootingStar();
         }
     }
     
-    // Update and draw stars (optimized)
+    // Update and draw stars
     function drawStars() {
-        ctx.fillStyle = 'white'; // Batch drawing where possible
-        
         stars.forEach(star => {
             star.twinklePhase += star.twinkleSpeed;
             const twinkleOpacity = (Math.sin(star.twinklePhase) + 1) / 2 * 0.5 + 0.5;
             
             let radius = star.radius;
-            if (star.pulsate && !onBattery) {  // Skip pulsation on battery
+            if (star.pulsate) {
                 radius += Math.sin(performance.now() * star.pulsateSpeed) * 0.5;
             }
             
-            ctx.globalAlpha = star.opacity * twinkleOpacity;
             ctx.beginPath();
             ctx.arc(star.x, star.y, radius, 0, Math.PI * 2);
             
-            if (star.color !== 'rgba(255, 255, 255, 1)') {
-                ctx.fillStyle = star.color;
-            }
+            const color = star.color.replace('1)', `${star.opacity * twinkleOpacity})`);
+            ctx.fillStyle = color;
             ctx.fill();
         });
-        
-        ctx.globalAlpha = 1.0;
     }
     
-    // Draw nebulae (simplified on battery)
+    // Draw nebulae
     function drawNebulae() {
         nebulae.forEach(nebula => {
             nebula.phase += 0.005;
-            const offsetX = onBattery ? 0 : Math.sin(nebula.phase) * 20;
-            const offsetY = onBattery ? 0 : Math.cos(nebula.phase) * 20;
+            const offsetX = Math.sin(nebula.phase) * 20;
+            const offsetY = Math.cos(nebula.phase) * 20;
             
             const gradient = ctx.createRadialGradient(
                 nebula.x + offsetX, nebula.y + offsetY, 0,
@@ -247,25 +195,22 @@ document.addEventListener('DOMContentLoaded', function() {
             gradient.addColorStop(0, nebula.color);
             gradient.addColorStop(1, nebula.outerColor);
             
-            ctx.fillStyle = gradient;
             ctx.beginPath();
             ctx.arc(nebula.x + offsetX, nebula.y + offsetY, nebula.radius, 0, Math.PI * 2);
+            ctx.fillStyle = gradient;
             ctx.fill();
         });
     }
     
-    // Update and draw meteors (limited particles on battery)
+    // Update and draw meteors
     function updateMeteors() {
-        const maxParticles = onBattery ? 10 : 30;
-        
         for (let i = meteors.length - 1; i >= 0; i--) {
             const meteor = meteors[i];
             
             meteor.x += Math.cos(meteor.angle) * meteor.speed;
             meteor.y += Math.sin(meteor.angle) * meteor.speed;
             
-            // Reduce particle generation on battery
-            if (meteor.particles.length < maxParticles && Math.random() < (onBattery ? 0.15 : 0.3)) {
+            if (Math.random() < 0.3) {
                 meteor.particles.push({
                     x: meteor.x - Math.cos(meteor.angle) * (Math.random() * 5),
                     y: meteor.y - Math.sin(meteor.angle) * (Math.random() * 5),
@@ -275,7 +220,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }
             
-            // Draw particles
             for (let j = meteor.particles.length - 1; j >= 0; j--) {
                 const particle = meteor.particles[j];
                 particle.opacity -= 0.02;
@@ -284,34 +228,30 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (particle.opacity <= 0 || particle.size <= 0.5) {
                     meteor.particles.splice(j, 1);
                 } else {
-                    ctx.globalAlpha = particle.opacity;
-                    ctx.fillStyle = `hsl(${particle.hue}, 100%, 50%)`;
                     ctx.beginPath();
                     ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+                    ctx.fillStyle = `hsla(${particle.hue}, 100%, 50%, ${particle.opacity})`;
                     ctx.fill();
                 }
             }
             
-            ctx.globalAlpha = 1.0;
-            
-            // Draw meteor trail
             const gradient = ctx.createLinearGradient(
                 meteor.x, meteor.y,
                 meteor.x - Math.cos(meteor.angle) * meteor.length,
                 meteor.y - Math.sin(meteor.angle) * meteor.length
             );
-            gradient.addColorStop(0, `hsl(${meteor.hue}, 100%, 70%)`);
+            gradient.addColorStop(0, `hsla(${meteor.hue}, 100%, 70%, 1)`);
             gradient.addColorStop(0.3, `hsla(${meteor.hue + 20}, 100%, 50%, 0.6)`);
             gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
             
-            ctx.strokeStyle = gradient;
-            ctx.lineWidth = meteor.width;
             ctx.beginPath();
             ctx.moveTo(meteor.x, meteor.y);
             ctx.lineTo(
                 meteor.x - Math.cos(meteor.angle) * meteor.length,
                 meteor.y - Math.sin(meteor.angle) * meteor.length
             );
+            ctx.lineWidth = meteor.width;
+            ctx.strokeStyle = gradient;
             ctx.stroke();
             
             if (meteor.y > canvas.height + 100 || meteor.x < -100 || meteor.x > canvas.width + 100) {
@@ -354,6 +294,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 continue;
             }
             
+            ctx.beginPath();
+            
             const trailLength = star.length * (1 - Math.min(progress * 2, 1));
             const trailX = star.currentX - (dx / totalDist) * trailLength;
             const trailY = star.currentY - (dy / totalDist) * trailLength;
@@ -362,75 +304,38 @@ document.addEventListener('DOMContentLoaded', function() {
                 trailX, trailY, star.currentX, star.currentY
             );
             gradient.addColorStop(0, `rgba(255, 255, 255, 0)`);
-            gradient.addColorStop(1, star.color.replace('hsl', 'hsla').replace(')', `, ${star.alpha})`));
+            gradient.addColorStop(1, star.color.replace('1)', `${star.alpha})`));
             
-            ctx.strokeStyle = gradient;
-            ctx.lineWidth = 2;
-            ctx.beginPath();
             ctx.moveTo(trailX, trailY);
             ctx.lineTo(star.currentX, star.currentY);
+            ctx.strokeStyle = gradient;
+            ctx.lineWidth = 2;
             ctx.stroke();
             
-            ctx.globalAlpha = star.alpha;
-            ctx.fillStyle = star.color;
             ctx.beginPath();
             ctx.arc(star.currentX, star.currentY, 1.5, 0, Math.PI * 2);
+            ctx.fillStyle = star.color.replace('1)', `${star.alpha})`);
             ctx.fill();
-            ctx.globalAlpha = 1.0;
         }
     }
     
-    // FPS limiter for battery saving
-    let lastRenderTime = 0;
-    function shouldRender(timestamp) {
-        const targetFPS = onBattery ? performanceMode.batteryFPS : performanceMode.targetFPS;
-        const minInterval = 1000 / targetFPS;
+    // Animation loop
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         
-        if (timestamp - lastRenderTime < minInterval) {
-            return false;
-        }
-        
-        lastRenderTime = timestamp;
-        return true;
-    }
-    
-    // Animation loop with FPS throttling
-    function animate(timestamp = performance.now()) {
-        // Stop animation when tab is hidden
-        if (!isVisible) return;
-        
-        // FPS limiting for battery saving
-        if (!shouldRender(timestamp)) {
-            requestAnimationFrame(animate);
-            return;
-        }
-        
-        // Calculate FPS
-        frameCount++;
-        if (frameCount % 60 === 0) {
-            const currentTime = performance.now();
-            fps = Math.round(1000 / (currentTime - lastFrameTime));
-            lastFrameTime = currentTime;
-        }
-        
-        // Clear and draw background
         const bgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
         bgGradient.addColorStop(0, 'rgba(10, 10, 30, 1)');
         bgGradient.addColorStop(1, 'rgba(5, 5, 20, 1)');
         ctx.fillStyle = bgGradient;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         
-        // Draw all elements
         drawNebulae();
         drawStars();
+        updateMeteors();
+        updateShootingStars();
         
-        if (!performanceMode.reducedMotion) {
-            updateMeteors();
-            updateShootingStars();
-            
-            maybeCreateShootingStar();
-            maybeCreateMeteor();
-        }
+        maybeCreateShootingStar();
+        maybeCreateMeteor();
         
         requestAnimationFrame(animate);
     }
@@ -440,7 +345,5 @@ document.addEventListener('DOMContentLoaded', function() {
     generateStars();
     animate();
     
-    console.log('Optimized Space Animation initialized!');
-    console.log(`Battery mode: ${onBattery ? 'Enabled' : 'Disabled'}`);
-    console.log(`Reduced motion: ${performanceMode.reducedMotion ? 'Enabled' : 'Disabled'}`);
+    console.log('Space Animation initialized successfully!');
 });
