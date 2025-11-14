@@ -11,20 +11,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     const ctx = canvas.getContext('2d');
     
-    // Set canvas size to full window
-    function resizeCanvas() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        
-        // Regenerate stars and nebulae after resize
-        generateNebulae();
-        generateStars();
-    }
-    
-    // Call resize on load and when window is resized
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
-    
     // Star properties
     const stars = [];
     const numStars = 200;
@@ -36,6 +22,25 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Add meteors
     const meteors = [];
+    
+    // Set canvas size to full window
+    function resizeCanvas() {
+        const oldWidth = canvas.width;
+        const oldHeight = canvas.height;
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        // Only regenerate if canvas actually changed size (not initial load)
+        if (oldWidth !== 0 && oldHeight !== 0) {
+            generateNebulae();
+            generateStars();
+        }
+    }
+    
+    // Call resize on load and when window is resized
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
     
     // Generate stars with colored stars
     function generateStars() {
