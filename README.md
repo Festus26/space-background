@@ -86,6 +86,10 @@ This animation started as the hero background of [semihyildirim.dev](https://sem
 - Works on macOS, Windows, and Linux
 - Mobile-friendly (automatically adjusts for smaller screens)
 
+## 📄 License
+
+[MIT](LICENSE) © Semih Yıldırım
+
 ---
 
 **Created by Festus26** 🚀
