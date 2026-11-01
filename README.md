@@ -1,6 +1,6 @@
-# 🌌 Standalone Space Animation Background
+# 🌌 Space Background
 
-This is a standalone version of the space animation that can be used independently without any dependencies.
+An animated space scene (twinkling stars, nebulae, shooting stars and meteors) drawn on an HTML5 canvas. No dependencies: open `index.html` and it fills the window.
 
 ## 📁 Files
 - `index.html` - Main HTML file with the canvas and styling
@@ -8,10 +8,9 @@ This is a standalone version of the space animation that can be used independent
 
 ## 🚀 How to Use
 
-### For Plush App (macOS Background)
-1. Open the `background` folder
-2. Open `index.html` in a web browser
-3. Use Plush app to set this webpage as your desktop background
+### As a macOS desktop background (Plush)
+1. Clone or download this repository
+2. In the Plush app, set `index.html` as your desktop background
 
 ### Standalone Usage
 Simply open `index.html` in any modern web browser. The animation will automatically:
@@ -37,8 +36,8 @@ Simply open `index.html` in any modern web browser. The animation will automatic
 
 ## 🎨 Customization
 
-### Remove Info Overlay
-If you don't want the info box in the bottom-right corner, simply delete or comment out this section in `index.html`:
+### Add an Info Overlay
+`index.html` already includes styles for a small info box in the bottom-right corner. To show it, add this inside `<body>`:
 ```html
 <div class="info-overlay">
     <h3>🌌 Space Animation</h3>
@@ -76,9 +75,9 @@ The animation is optimized for smooth performance with:
 - Minimal CPU usage
 - Smooth 60 FPS animation
 
-## 🌐 Original Website
+## 🌐 Origin
 
-This animation is part of the main portfolio website but has been extracted into a standalone version that works independently.
+This animation started as the hero background of [semihyildirim.dev](https://semihyildirim.dev).
 
 ## 📝 Notes
 
