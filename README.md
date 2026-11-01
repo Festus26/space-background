@@ -18,6 +18,18 @@ Simply open `index.html` in any modern web browser. The animation will automatic
 - Resize when the window is resized
 - Show stars, nebulae, shooting stars, and meteors
 
+### On your own page
+Add a canvas and the script. The animation fills the canvas's CSS box, so size the canvas however you like:
+```html
+<canvas id="space-canvas" style="width: 100%; height: 400px"></canvas>
+<script src="space-animation.js"></script>
+```
+For a canvas with a different id, start it yourself:
+```javascript
+const sky = SpaceAnimation.start(document.querySelector('#my-canvas'), { fps: 30 });
+sky.stop(); // when you no longer need it
+```
+
 ## ✨ Features
 
 ### Animated Elements
@@ -45,35 +57,45 @@ Simply open `index.html` in any modern web browser. The animation will automatic
 </div>
 ```
 
+### Frame Rate
+Lower the frame rate to save power, for example when using it as a wallpaper. Use a URL parameter or a data attribute on the canvas:
+
+| Option | URL parameter | Data attribute | Default |
+|---|---|---|---|
+| Frame rate cap | `?fps=30` | `data-fps="30"` | 60 |
+| Frame rate cap on battery | `?batteryFps=20` | `data-battery-fps="20"` | 30 |
+
+For example, set `index.html?fps=30` as the wallpaper URL in Plush.
+
 ### Adjust Number of Elements
-Edit `space-animation.js` to change quantities:
+Edit the constants at the top of `space-animation.js`:
 ```javascript
-const numStars = 200;      // Number of stars
-const numNebulae = 5;      // Number of nebulae
+const NUM_STARS = 200;     // Number of stars
+const NUM_NEBULAE = 5;     // Number of nebulae
 ```
 
 ### Change Colors
-Modify the color arrays in `space-animation.js`:
+Modify the color arrays in `space-animation.js` (`[r, g, b, alpha]`):
 ```javascript
-const starColors = [...];  // Star colors
-const colors = [...];      // Nebula colors
+const STAR_COLORS = [...];    // Star colors
+const NEBULA_COLORS = [...];  // Nebula colors
 ```
 
 ## 🔧 Technical Details
 
 - **Canvas-based**: Uses HTML5 Canvas API
-- **Responsive**: Automatically resizes to window size
+- **Responsive**: Fills its canvas's CSS box and follows it when it resizes, without regenerating the sky
+- **Sharp on Retina**: Renders at the screen's pixel density (up to 2×)
+- **Same speed on any display**: Motion is based on elapsed time, so 120Hz screens don't run it faster
 - **No dependencies**: Pure vanilla JavaScript
-- **Performance optimized**: Uses requestAnimationFrame
 - **Browser compatibility**: Works in all modern browsers
 
 ## 📱 Performance
 
-The animation is optimized for smooth performance with:
-- Efficient particle system
-- Smart cleanup of off-screen elements
-- Minimal CPU usage
-- Smooth 60 FPS animation
+- **Pauses** when the tab is hidden or the canvas is scrolled out of view
+- **30 fps on battery** where the browser reports battery status (Chrome, Edge); adjustable, see above
+- **Respects reduced motion**: with the system's "reduce motion" setting on, it shows a still sky and doesn't animate
+- **Cheap background**: the background gradient and nebulae are drawn at quarter resolution, 10 times a second
 
 ## 🌐 Origin
 
