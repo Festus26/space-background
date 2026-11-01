@@ -5,12 +5,15 @@
 // Options (data attributes on the canvas, or URL parameters which win):
 //   data-fps / ?fps=                  frame rate cap (default 60)
 //   data-battery-fps / ?batteryFps=   frame rate cap on battery, where the browser reports it (default 30)
+//   data-comet-fps / ?cometFps=       frame rate cap while meteors or shooting stars are on screen
+//                                     (default: the display's full refresh rate, overriding the caps above)
 // Other canvases: SpaceAnimation.start(canvas, { fps: 30 }) returns { stop() }.
 
 (function() {
     const DEFAULTS = {
         fps: 60,
-        batteryFps: 30
+        batteryFps: 30,
+        cometFps: 0         // 0 = the display's full refresh rate
     };
 
     const NUM_STARS = 200;
@@ -46,7 +49,8 @@
         const params = new URLSearchParams(window.location.search);
         const sources = [
             ['fps', canvas.dataset.fps, params.get('fps')],
-            ['batteryFps', canvas.dataset.batteryFps, params.get('batteryFps')]
+            ['batteryFps', canvas.dataset.batteryFps, params.get('batteryFps')],
+            ['cometFps', canvas.dataset.cometFps, params.get('cometFps')]
         ];
         sources.forEach(([key, dataValue, urlValue]) => {
             [dataValue, urlValue].forEach(value => {
@@ -326,9 +330,11 @@
         function animate(now) {
             frameId = requestAnimationFrame(animate);
 
-            const fps = onBattery ? Math.min(options.fps, options.batteryFps) : options.fps;
+            // Fast-moving meteors and shooting stars look choppy at a low frame rate, so lift the cap while any are on screen
+            const cometsActive = meteors.length > 0 || shootingStars.length > 0;
+            const fps = cometsActive ? options.cometFps : (onBattery ? Math.min(options.fps, options.batteryFps) : options.fps);
             const elapsed = now - lastFrameTime;
-            if (elapsed < 1000 / fps - 2) return;
+            if (fps > 0 && elapsed < 1000 / fps - 2) return;
 
             // Movement was tuned for 60fps; scale it by real elapsed time so 120Hz screens aren't twice as fast
             const step = Math.min(elapsed / (1000 / 60), MAX_STEP);

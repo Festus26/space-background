@@ -64,6 +64,9 @@ Lower the frame rate to save power, for example when using it as a wallpaper. Us
 |---|---|---|---|
 | Frame rate cap | `?fps=30` | `data-fps="30"` | 60 |
 | Frame rate cap on battery | `?batteryFps=20` | `data-battery-fps="20"` | 30 |
+| Frame rate cap while meteors or shooting stars are on screen | `?cometFps=60` | `data-comet-fps="60"` | display refresh rate |
+
+Meteors and shooting stars move fast and look choppy at low frame rates, so by default the animation runs at the display's full refresh rate while one is visible, overriding the caps above. Since one is visible most of the time, set `cometFps` too if you want to save power (for example `?fps=30&cometFps=30`).
 
 For example, set `index.html?fps=30` as the wallpaper URL in Plush.
 
@@ -93,7 +96,7 @@ const NEBULA_COLORS = [...];  // Nebula colors
 ## 📱 Performance
 
 - **Pauses** when the tab is hidden or the canvas is scrolled out of view
-- **30 fps on battery** where the browser reports battery status (Chrome, Edge); adjustable, see above
+- **30 fps on battery** while no meteors or shooting stars are on screen, where the browser reports battery status (Chrome, Edge); adjustable, see above
 - **Respects reduced motion**: with the system's "reduce motion" setting on, it shows a still sky and doesn't animate
 - **Cheap background**: the background gradient and slowly drifting nebulae are redrawn 10 times a second, not every frame
 
