@@ -15,7 +15,7 @@
 
     const NUM_STARS = 200;
     const NUM_NEBULAE = 5;
-    const SKY_SCALE = 0.25;         // background + nebulae are smooth gradients, so draw them at 1/4 resolution
+    const SKY_SCALE = 1;            // background + nebulae at CSS resolution; lower scales show blocky banding
     const SKY_REDRAW_MS = 100;      // nebulae drift a few pixels per second; no need to redraw them every frame
     const MAX_STEP = 6;             // after a pause, advance at most 6 frames' worth of motion
 

@@ -95,7 +95,7 @@ const NEBULA_COLORS = [...];  // Nebula colors
 - **Pauses** when the tab is hidden or the canvas is scrolled out of view
 - **30 fps on battery** where the browser reports battery status (Chrome, Edge); adjustable, see above
 - **Respects reduced motion**: with the system's "reduce motion" setting on, it shows a still sky and doesn't animate
-- **Cheap background**: the background gradient and nebulae are drawn at quarter resolution, 10 times a second
+- **Cheap background**: the background gradient and slowly drifting nebulae are redrawn 10 times a second, not every frame
 
 ## 🌐 Origin
 
